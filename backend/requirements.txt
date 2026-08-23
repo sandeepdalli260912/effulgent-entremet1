@@ -1,0 +1,5 @@
+# Delhi Bhu-Praman Backend Requirements
+# The backend uses the Python 3 standard library (http.server, socketserver, urllib, json, hashlib)
+# No external pip packages required for base server execution.
+
+# Python Version Support: >= 3.8

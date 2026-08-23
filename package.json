@@ -1,0 +1,21 @@
+{
+  "name": "delhi-bhu-praman",
+  "version": "2.4.0",
+  "description": "Unified Single Window Portal for Land Ownership, Executed Deeds & Encumbrance Verification (NCT of Delhi)",
+  "main": "frontend/index.html",
+  "scripts": {
+    "start": "python run.py",
+    "dev": "python run.py",
+    "server": "python backend/server.py",
+    "test": "python backend/test_portal.py"
+  },
+  "keywords": [
+    "delhi-land-records",
+    "encumbrance-certificate",
+    "cersai",
+    "doris",
+    "bhulekh"
+  ],
+  "author": "Government of NCT of Delhi",
+  "license": "ISC"
+}

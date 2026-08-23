@@ -1,0 +1,182 @@
+/* ==========================================================================
+   Delhi Bhu-Praman - GIS Cadastral Map & Parcel Explorer Styles
+   ========================================================================== */
+
+.map-explorer-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: 16px;
+  box-shadow: var(--shadow-md);
+  min-height: 620px;
+}
+
+@media (max-width: 900px) {
+  .map-explorer-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.map-controls-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-right: 8px;
+  overflow-y: auto;
+  max-height: 600px;
+}
+
+.map-control-group {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+}
+
+.map-control-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-secondary);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.map-layer-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.map-layer-checkbox {
+  cursor: pointer;
+  accent-color: var(--primary-blue);
+  width: 16px;
+  height: 16px;
+}
+
+.district-selector-dropdown {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.map-container-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 560px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+#gis-map-canvas {
+  width: 100%;
+  height: 100%;
+  min-height: 560px;
+  background: #0f172a;
+}
+
+.map-floating-legend {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background: var(--bg-surface-glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  box-shadow: var(--shadow-lg);
+  font-size: 0.75rem;
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.legend-item:last-child {
+  margin-bottom: 0;
+}
+
+.legend-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legend-color-dot.clear { background: #10b981; }
+.legend-color-dot.mortgaged { background: #f59e0b; }
+.legend-color-dot.disputed { background: #f43f5e; }
+.legend-color-dot.acquired { background: #be123c; }
+
+/* Custom Leaflet Popup */
+.custom-delhi-popup .leaflet-popup-content-wrapper {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  border: 1px solid var(--border-color);
+  padding: 4px;
+}
+
+.custom-delhi-popup .leaflet-popup-tip {
+  background: var(--bg-surface);
+}
+
+.popup-content-card {
+  padding: 8px;
+  min-width: 220px;
+}
+
+.popup-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.popup-sub {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.popup-inspect-btn {
+  width: 100%;
+  padding: 6px 12px;
+  background: var(--primary-blue);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  transition: var(--transition-fast);
+}
+
+.popup-inspect-btn:hover {
+  background: #1e40af;
+}

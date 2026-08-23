@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delhi Bhu-Praman | Single Portal for Land Ownership, Deeds & Encumbrance Verification (NCT of Delhi)</title>
+  <meta name="description" content="Unified Single Window Portal for NCT of Delhi integrating Urban & Rural Land Records, DORIS Executed Deeds, and CERSAI Multi-Bank Encumbrances.">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Leaflet GIS Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+  <!-- Core Stylesheets -->
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+  <link rel="stylesheet" href="css/map.css">
+</head>
+<body>
+
+  <!-- Top Government Header Bar -->
+  <div class="gov-top-bar">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span><i class="fas fa-shield-halved" style="color: #60a5fa;"></i> <strong>Government of NCT of Delhi</strong> • Revenue & Registration Department</span>
+    </div>
+    <div class="top-bar-controls">
+      <button class="lang-btn" id="lang-toggle-btn" onclick="App.toggleLanguage()">हिन्दी (HI)</button>
+      <button class="theme-toggle-btn" id="theme-toggle-btn">
+        <i class="fas fa-moon"></i> Dark Mode
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Navigation Header -->
+  <header class="main-header">
+    <div class="header-container">
+      <div class="portal-brand" onclick="App.switchMainTab('dossier-view')">
+        <div class="emblem-icon">
+          <i class="fas fa-landmark-dome"></i>
+        </div>
+        <div class="brand-text">
+          <h1>दिल्ली भू-प्रमाण • Delhi Bhu-Praman</h1>
+          <p>Unified Portal for Land Ownership, Executed Deeds & Encumbrances</p>
+        </div>
+      </div>
+
+      <nav>
+        <ul class="nav-links">
+          <li>
+            <button class="nav-item-btn active" data-view="dossier-view">
+              <i class="fas fa-layer-group"></i> Property 360° Dossier
+            </button>
+          </li>
+          <li>
+            <button class="nav-item-btn" data-view="map-view">
+              <i class="fas fa-map-marked-alt"></i> Cadastral GIS Map
+            </button>
+          </li>
+          <li>
+            <button class="nav-item-btn" data-view="bank-view">
+              <i class="fas fa-university"></i> Bank / CERSAI Gateway
+            </button>
+          </li>
+          <li>
+            <button class="nav-item-btn" data-view="api-view">
+              <i class="fas fa-code"></i> API Sandbox
+            </button>
+          </li>
+          <li>
+            <button class="nav-item-btn" data-view="about-view">
+              <i class="fas fa-info-circle"></i> Synopsis
+            </button>
+          </li>
+          <li>
+            <span class="live-badge-pulse">
+              <span class="pulse-dot"></span> 6 Platforms Synced
+            </span>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Live Integrated System Ticker -->
+  <div class="live-ticker-bar">
+    <span class="ticker-tag"><i class="fas fa-sync-alt fa-spin"></i> LIVE FEEDS</span>
+    <div class="ticker-content">
+      <strong>[DORIS IGR]</strong> 6.89M Registered Deeds Digitized • 
+      <strong>[CERSAI]</strong> 512,400 Commercial Bank Mortgages Synchronized • 
+      <strong>[Bhulekh Delhi]</strong> 1.33M Rural Khasra/Khatauni Records Integrated • 
+      <strong>[MCD UPIC]</strong> 2.84M Urban Property Identification Codes Linked • 
+      <strong>[DDA MPD 2041]</strong> Master Plan Zoning Validations Active • 
+      <strong>[Delhi High Court]</strong> Civil Attachment Orders Flagged in Real-Time
+    </div>
+  </div>
+
+  <!-- Hero Section & Standard Input Unified Search Matrix -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <div class="hero-subtitle">
+        <i class="fas fa-check-double"></i> Unified Multi-Stakeholder Intelligence
+      </div>
+      <h2 class="hero-title">
+        Single Window <span>Land Records, Deeds & Encumbrances</span> for Delhi
+      </h2>
+      <p class="hero-description">
+        Comprehensive title verification across all 11 Delhi Districts for Citizens, Financial Institutions, Sub-Registrars, and Legal Advocates.
+      </p>
+
+      <!-- Search Matrix Card -->
+      <div class="search-matrix-card">
+        <div class="search-mode-tabs">
+          <button class="search-tab-btn active" data-mode="ALL">
+            <i class="fas fa-globe"></i> Universal Search
+          </button>
+          <button class="search-tab-btn" data-mode="UPIC">
+            <i class="fas fa-barcode"></i> UPIC / D-PIN (Urban)
+          </button>
+          <button class="search-tab-btn" data-mode="KHASRA">
+            <i class="fas fa-tractor"></i> Khasra / Khatauni (Rural)
+          </button>
+          <button class="search-tab-btn" data-mode="DEED">
+            <i class="fas fa-file-signature"></i> Registered Deed No.
+          </button>
+          <button class="search-tab-btn" data-mode="CERSAI">
+            <i class="fas fa-building-columns"></i> CERSAI / Bank Loan ID
+          </button>
+        </div>
+
+        <form id="unified-search-form" class="main-search-input-group">
+          <div class="search-field-wrapper">
+            <i class="fas fa-search search-icon-inside"></i>
+            <input 
+              type="text" 
+              id="main-search-input" 
+              class="main-search-input"
+              placeholder="Enter UPIC / Khasra No / Deed Reg No / CERSAI ID / Property Address / Owner Name..."
+              value="DL-MCD-2024-884912"
+              autocomplete="off"
+            />
+          </div>
+          <button type="submit" class="search-submit-btn">
+            <i class="fas fa-shield-alt"></i> Verify Property & Encumbrance
+          </button>
+        </form>
+
+        <!-- Quick Pick Chips for Instant Testing -->
+        <div class="quick-samples-wrapper">
+          <span class="quick-samples-label"><i class="fas fa-bolt"></i> Sample Records:</span>
+          <span class="sample-chip" data-query="DL-MCD-2024-884912">
+            <i class="fas fa-check-circle text-emerald-500"></i> Vasant Kunj (Clear Title Plotted)
+          </span>
+          <span class="sample-chip highlight" data-query="DL-MCD-2021-394810">
+            <i class="fas fa-lock text-amber-500"></i> Greater Kailash-II (SBI Mortgaged)
+          </span>
+          <span class="sample-chip danger" data-query="DL-REV-2023-BAP-4212">
+            <i class="fas fa-gavel text-rose-500"></i> Khasra 42/12 Najafgarh (High Court Stay & PNB Lien)
+          </span>
+          <span class="sample-chip" data-query="DL-MCD-2022-771923">
+            <i class="fas fa-building text-blue-500"></i> Sector 13 Rohini (DDA SFS Flat)
+          </span>
+          <span class="sample-chip highlight" data-query="DL-DDA-2019-NP-COMM-09">
+            <i class="fas fa-briefcase text-purple-500"></i> Nehru Place Commercial (Consortium Loan)
+          </span>
+          <span class="sample-chip" data-query="DL-REV-2020-MEH-CP-190">
+            <i class="fas fa-home text-teal-500"></i> Chhatarpur (PM-UDAY Regularized)
+          </span>
+          <span class="sample-chip danger" data-query="DL-REV-2018-ALI-K91">
+            <i class="fas fa-road text-rose-500"></i> Village Alipur (UER-II Expressway Acquisition)
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Key Aggregate Metrics Banner -->
+  <section class="stats-metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon-box blue">
+        <i class="fas fa-building-user"></i>
+      </div>
+      <div class="metric-info">
+        <h3>2.84M</h3>
+        <p>Urban UPIC Records (MCD & DDA)</p>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon-box green">
+        <i class="fas fa-wheat-awn"></i>
+      </div>
+      <div class="metric-info">
+        <h3>1.33M</h3>
+        <p>Rural Khasras (Bhulekh Delhi)</p>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon-box purple">
+        <i class="fas fa-file-contract"></i>
+      </div>
+      <div class="metric-info">
+        <h3>6.89M</h3>
+        <p>30-Yr Deeds Indexed (DORIS)</p>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon-box amber">
+        <i class="fas fa-building-columns"></i>
+      </div>
+      <div class="metric-info">
+        <h3>512.4K</h3>
+        <p>Active CERSAI Bank Charges</p>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon-box rose">
+        <i class="fas fa-shield-halved"></i>
+      </div>
+      <div class="metric-info">
+        <h3>34.1K</h3>
+        <p>Frauds & Stays Blocked</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Stakeholder Workspaces -->
+  <main class="main-portal-view">
+
+    <!-- View 1: 360° Property Dossier & Title Chain -->
+    <div id="dossier-view" class="portal-tab-content active">
+      <div class="view-section-header" id="property-dossier-section">
+        <div class="section-title">
+          <h2>Property 360° Comprehensive Dossier</h2>
+          <p>Integrated Ownership Records, DORIS Executed Deeds & CERSAI Encumbrance Registry</p>
+        </div>
+      </div>
+
+      <div class="dossier-layout">
+        <!-- Left Column: Summary Card & AI Title Health Score -->
+        <aside class="dossier-sidebar" id="dossier-sidebar-container">
+          <!-- Dynamically populated by DossierViewer -->
+        </aside>
+
+        <!-- Right Column: Dossier Tabs & Deep Data Views -->
+        <div class="dossier-main-content">
+          <div class="dossier-nav-tabs">
+            <button class="dossier-tab-btn active" data-panel="panel-overview">
+              <i class="fas fa-info-circle"></i> Ownership & Zoning
+            </button>
+            <button class="dossier-tab-btn" data-panel="panel-deeds">
+              <i class="fas fa-timeline"></i> 30-Year Title Chain (Deeds)
+            </button>
+            <button class="dossier-tab-btn" data-panel="panel-encumbrance">
+              <i class="fas fa-lock"></i> Encumbrance & Mortgages (CERSAI)
+            </button>
+            <button class="dossier-tab-btn" data-panel="panel-risk">
+              <i class="fas fa-robot"></i> AI Title Due Diligence
+            </button>
+          </div>
+
+          <!-- Tab Panels -->
+          <div id="panel-overview" class="dossier-sub-panel active"></div>
+          <div id="panel-deeds" class="dossier-sub-panel"></div>
+          <div id="panel-encumbrance" class="dossier-sub-panel"></div>
+          <div id="panel-risk" class="dossier-sub-panel"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 2: GIS Cadastral Map Explorer -->
+    <div id="map-view" class="portal-tab-content">
+      <div class="view-section-header">
+        <div class="section-title">
+          <h2>Delhi Cadastral GIS Map & Parcel Explorer</h2>
+          <p>Spatial parcel overlay across all 11 Delhi Revenue Districts with live encumbrance pins</p>
+        </div>
+      </div>
+
+      <div class="map-explorer-layout">
+        <!-- Left Map Controls -->
+        <div class="map-controls-panel">
+          <div class="map-control-group">
+            <div class="map-control-title"><i class="fas fa-map-location-dot"></i> Select District</div>
+            <select class="district-selector-dropdown" id="map-district-select">
+              <option value="ALL">All 11 Districts of Delhi</option>
+              <option value="New Delhi">New Delhi (Chanakyapuri, Vasant Vihar)</option>
+              <option value="South Delhi">South Delhi (Hauz Khas, Mehrauli)</option>
+              <option value="South West Delhi">South West (Dwarka, Najafgarh)</option>
+              <option value="South East Delhi">South East (Defence Colony, Kalkaji)</option>
+              <option value="North West Delhi">North West (Rohini, Kanjhawala)</option>
+              <option value="North Delhi">North Delhi (Alipur, Narela)</option>
+              <option value="East Delhi">East Delhi (Mayur Vihar, Preet Vihar)</option>
+              <option value="West Delhi">West Delhi (Janakpuri, Punjabi Bagh)</option>
+              <option value="Central Delhi">Central Delhi (Civil Lines, Karol Bagh)</option>
+              <option value="Shahdara">Shahdara (Vivek Vihar, Seemapuri)</option>
+              <option value="North East Delhi">North East (Seelampur, Yamuna Vihar)</option>
+            </select>
+          </div>
+
+          <div class="map-control-group">
+            <div class="map-control-title"><i class="fas fa-filter"></i> Filter Properties by Status</div>
+            <label class="map-layer-item">
+              <span>Show All Properties</span>
+              <input type="radio" name="mapLayer" class="map-layer-filter" value="ALL" checked>
+            </label>
+            <label class="map-layer-item">
+              <span><i class="fas fa-check-circle" style="color:#10b981;"></i> Clear Title Only</span>
+              <input type="radio" name="mapLayer" class="map-layer-filter" value="CLEAR">
+            </label>
+            <label class="map-layer-item">
+              <span><i class="fas fa-lock" style="color:#f59e0b;"></i> Active Bank Mortgages</span>
+              <input type="radio" name="mapLayer" class="map-layer-filter" value="MORTGAGED">
+            </label>
+            <label class="map-layer-item">
+              <span><i class="fas fa-city" style="color:#2563eb;"></i> Urban (UPIC/DDA)</span>
+              <input type="radio" name="mapLayer" class="map-layer-filter" value="URBAN">
+            </label>
+            <label class="map-layer-item">
+              <span><i class="fas fa-tractor" style="color:#059669;"></i> Rural Khasra (Bhulekh)</span>
+              <input type="radio" name="mapLayer" class="map-layer-filter" value="RURAL">
+            </label>
+          </div>
+
+          <div class="map-control-group">
+            <div class="map-control-title"><i class="fas fa-info-circle"></i> Cadastral Info</div>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); line-height: 1.5;">
+              Click on any colored parcel pin on the map to view ownership snapshot and inspect the 30-year deed history.
+            </p>
+          </div>
+        </div>
+
+        <!-- Right Map Canvas Container -->
+        <div class="map-container-wrapper">
+          <div id="gis-map-canvas"></div>
+          <div class="map-floating-legend">
+            <div class="legend-item">
+              <span class="legend-color-dot clear"></span> Clear Title (Nil Encumbrance)
+            </div>
+            <div class="legend-item">
+              <span class="legend-color-dot mortgaged"></span> Active Bank Mortgage (CERSAI)
+            </div>
+            <div class="legend-item">
+              <span class="legend-color-dot disputed"></span> Legal Stay / Acquisition Warning
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 3: Bank & Financial Institution Mortgage Gateway -->
+    <div id="bank-view" class="portal-tab-content">
+      <div class="view-section-header">
+        <div class="section-title">
+          <h2>Bank & Lending Institution Mortgage Filing Portal</h2>
+          <p>Secure collateral due diligence, fresh equitable mortgage creation & CERSAI charge synchronization</p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <div class="dossier-card">
+          <h4 style="font-size: 1.1rem; margin-bottom: 16px; display:flex; align-items:center; gap:8px;">
+            <i class="fas fa-university" style="color: var(--primary-blue);"></i>
+            Lodge Fresh Mortgage / Security Interest
+          </h4>
+
+          <form id="bank-lodge-mortgage-form" style="display: flex; flex-direction: column; gap: 14px;">
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">
+                Select Target Property (UPIC / Khasra):
+              </label>
+              <select id="bank-property-select" class="district-selector-dropdown" style="width: 100%;"></select>
+            </div>
+
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">
+                Lending Bank / Financial Institution:
+              </label>
+              <select id="bank-lender-name" class="district-selector-dropdown" style="width: 100%;">
+                <option value="State Bank of India">State Bank of India (SBI)</option>
+                <option value="HDFC Bank Ltd.">HDFC Bank Ltd.</option>
+                <option value="ICICI Bank Ltd.">ICICI Bank Ltd.</option>
+                <option value="Punjab National Bank">Punjab National Bank (PNB)</option>
+                <option value="Bank of Baroda">Bank of Baroda</option>
+                <option value="Axis Bank Ltd.">Axis Bank Ltd.</option>
+                <option value="Canara Bank">Canara Bank</option>
+              </select>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">
+                  Sanction Amount (INR):
+                </label>
+                <input type="text" id="bank-loan-amount" class="main-search-input" style="padding: 10px 14px; font-size: 0.9rem;" value="75,00,000" required />
+              </div>
+              <div>
+                <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">
+                  Loan Account Number:
+                </label>
+                <input type="text" id="bank-loan-acc" class="main-search-input" style="padding: 10px 14px; font-size: 0.9rem;" value="SBI-HL-2024-99120" required />
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 4px;">
+                Type of Charge:
+              </label>
+              <select id="bank-charge-type" class="district-selector-dropdown" style="width: 100%;">
+                <option value="EQUITABLE_MORTGAGE">Equitable Mortgage (Deposit of Title Deeds)</option>
+                <option value="REGISTERED_MORTGAGE">Registered Mortgage Deed (Sub-Registrar)</option>
+                <option value="PARI_PASSU_CONSORTIUM">Pari-Passu Consortium Charge</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn-primary" style="justify-content: center; margin-top: 10px; padding: 14px;">
+              <i class="fas fa-shield-alt"></i> Lodge Lien & Broadcast CERSAI Identifier
+            </button>
+          </form>
+        </div>
+
+        <div class="dossier-card">
+          <h4 style="font-size: 1.1rem; margin-bottom: 14px;">
+            <i class="fas fa-shield-check" style="color: #059669;"></i> Real-Time Fraud Prevention Protocol
+          </h4>
+          <p style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6; margin-bottom: 16px;">
+            When a financial institution lodges a mortgage on this portal:
+          </p>
+          <ul style="font-size: 0.82rem; color: var(--text-secondary); line-height: 1.8; padding-left: 20px;">
+            <li><strong>Automated Double-Mortgage Interceptor:</strong> Instantly cross-checks against all commercial banks, NBFCs, and housing finance companies to stop multiple loans on the same title deeds.</li>
+            <li><strong>Sub-Registrar Lock:</strong> Automatically places a temporary caveat on the property in the DORIS Sub-Registrar registry so that the seller cannot execute an illegal sale deed while the mortgage is active.</li>
+            <li><strong>CERSAI Direct Linkage:</strong> Issues a verifiable Central Registry of Securitisation asset ID with digital cryptographic timestamping.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 4: Inter-Platform API Gateway Sandbox -->
+    <div id="api-view" class="portal-tab-content">
+      <div class="view-section-header">
+        <div class="section-title">
+          <h2>Inter-Platform API Integration Sandbox</h2>
+          <p>Test live REST API integration between DORIS, CERSAI, Bhulekh Delhi, MCD, and DDA</p>
+        </div>
+      </div>
+
+      <div class="dossier-card">
+        <div style="display: flex; gap: 14px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+          <label style="font-weight: 700; font-size: 0.85rem;">Select Endpoint:</label>
+          <select id="api-endpoint-select" class="district-selector-dropdown" style="width: auto; min-width: 320px;">
+            <option value="GET_HEALTH">GET /api/health (Source Connector Status)</option>
+            <option value="GET_STATS">GET /api/stats (NCT Delhi Real Estate Aggregate Stats)</option>
+            <option value="POST_MORTGAGE">POST /api/bank/lodge-mortgage (CERSAI Filing)</option>
+            <option value="POST_VERIFY">POST /api/verify-certificate (QR Cryptographic Verify)</option>
+          </select>
+          <button id="api-execute-btn" class="btn-primary" style="padding: 8px 18px;">
+            <i class="fas fa-play"></i> Execute API Call
+          </button>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div>
+            <h5 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Request Payload (JSON)</h5>
+            <pre id="api-request-payload" style="background: #0b1329; color: #38bdf8; padding: 16px; border-radius: var(--radius-md); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; overflow-x: auto; min-height: 200px;">// GET /api/health
+// Headers: Authorization: Bearer TOKEN_NCT_DELHI</pre>
+          </div>
+          <div>
+            <h5 style="font-size: 0.8rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;">Response Payload (HTTP 200 OK)</h5>
+            <pre id="api-response-output" style="background: #0b1329; color: #4ade80; padding: 16px; border-radius: var(--radius-md); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; overflow-x: auto; min-height: 200px;">{
+  "status": "ready",
+  "message": "Click 'Execute API Call' to test live response"
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- View 5: Synopsis & Legal Framework -->
+    <div id="about-view" class="portal-tab-content">
+      <div class="view-section-header">
+        <div class="section-title">
+          <h2>Project Synopsis & Architecture Overview</h2>
+          <p>National Capital Territory of Delhi Unified Land Ownership & Encumbrance Information System</p>
+        </div>
+      </div>
+
+      <div class="dossier-card">
+        <h3 style="font-size: 1.3rem; margin-bottom: 12px; color: var(--primary-blue);">Problem Statement & Objectives</h3>
+        <p style="font-size: 0.9rem; line-height: 1.7; color: var(--text-secondary); margin-bottom: 20px;">
+          The Government of NCT of Delhi requires a single-window portal that resolves the historical fragmentation between urban land records (MCD/DDA/L&DO), rural revenue records (Bhulekh Delhi / Record of Rights), executed deeds (DORIS Sub-Registrar database), and multi-platform encumbrances (CERSAI, Commercial Banks, Debt Recovery Tribunals, High Court injunctions, and Land Acquisition notifications).
+        </p>
+
+        <div class="detail-grid" style="margin-bottom: 24px;">
+          <div style="background: var(--bg-subtle); padding: 16px; border-radius: var(--radius-md);">
+            <h4 style="font-size: 0.95rem; margin-bottom: 6px; color: var(--text-primary);"><i class="fas fa-check-circle" style="color: #10b981;"></i> 1. Integrated Records</h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary);">Seamlessly unites urban plotted UPIC records with rural Bigha-Biswa Khasra/Khatauni parcels across all 11 Delhi Districts.</p>
+          </div>
+          <div style="background: var(--bg-subtle); padding: 16px; border-radius: var(--radius-md);">
+            <h4 style="font-size: 0.95rem; margin-bottom: 6px; color: var(--text-primary);"><i class="fas fa-check-circle" style="color: #10b981;"></i> 2. Multi-Platform Encumbrances</h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary);">Consolidates CERSAI mortgage registries, bank liens, High Court stays, DRT cases, and MCD tax default attachments into an exhaustive database.</p>
+          </div>
+          <div style="background: var(--bg-subtle); padding: 16px; border-radius: var(--radius-md);">
+            <h4 style="font-size: 0.95rem; margin-bottom: 6px; color: var(--text-primary);"><i class="fas fa-check-circle" style="color: #10b981;"></i> 3. Standard Input Search</h4>
+            <p style="font-size: 0.8rem; color: var(--text-secondary);">Enables instant discovery using any standard identifier: UPIC, D-PIN, Khasra No., Deed Reg No., CERSAI ID, Owner Name, or Locality.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Modals -->
+
+  <!-- Scanned Deed & e-Stamp Certificate Modal -->
+  <div id="deed-modal" class="modal-overlay">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3><i class="fas fa-file-invoice" style="color: var(--primary-blue);"></i> DORIS Digitized Deed & e-Stamp Record</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" id="deed-modal-body"></div>
+      <div class="modal-footer">
+        <button class="btn-secondary modal-cancel-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Encumbrance Certificate (Form 15 / Form 16) Printable Modal -->
+  <div id="ec-certificate-modal" class="modal-overlay">
+    <div class="modal-dialog" style="max-width: 900px;">
+      <div class="modal-header">
+        <h3><i class="fas fa-file-contract" style="color: var(--primary-blue);"></i> Official Encumbrance Certificate (NCT of Delhi)</h3>
+        <button class="modal-close-btn">&times;</button>
+      </div>
+      <div class="modal-body" id="ec-certificate-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Footer -->
+  <footer class="portal-footer">
+    <div class="footer-grid">
+      <div class="footer-col">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+          <div class="emblem-icon" style="width: 36px; height: 36px; font-size: 1.1rem;">
+            <i class="fas fa-landmark-dome"></i>
+          </div>
+          <h4 style="margin-bottom: 0;">दिल्ली भू-प्रमाण • Delhi Bhu-Praman</h4>
+        </div>
+        <p>
+          Unified Single Window Portal for Land Ownership Records, Executed Deeds & Encumbrances. Developed for the Government of National Capital Territory of Delhi.
+        </p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Integrated Systems</h4>
+        <ul>
+          <li><a href="#dossier-view" onclick="App.switchMainTab('dossier-view')">DORIS Deed Registry</a></li>
+          <li><a href="#dossier-view" onclick="App.switchMainTab('dossier-view')">Delhi Revenue Bhulekh</a></li>
+          <li><a href="#bank-view" onclick="App.switchMainTab('bank-view')">CERSAI Central Registry</a></li>
+          <li><a href="#map-view" onclick="App.switchMainTab('map-view')">MCD & DDA Land Records</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Key Services</h4>
+        <ul>
+          <li><a href="#dossier-view" onclick="App.openCertificateModal()">Download EC (Form 15/16)</a></li>
+          <li><a href="#map-view" onclick="App.switchMainTab('map-view')">Cadastral GIS Explorer</a></li>
+          <li><a href="#bank-view" onclick="App.switchMainTab('bank-view')">Bank Lien Filing Gateway</a></li>
+          <li><a href="#api-view" onclick="App.switchMainTab('api-view')">Open API Documentation</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Statutory Compliance</h4>
+        <p style="font-size: 0.75rem; color: #64748b;">
+          Operates under The Registration Act, 1908 • Delhi Land Reforms Act, 1954 • SARFAESI Act, 2002 • Master Plan for Delhi (MPD 2041) • Information Technology Act, 2000.
+        </p>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© 2026 Government of NCT of Delhi • All Rights Reserved</div>
+      <div>Designed for Supreme Citizen Transparency, Bank Collateral Due Diligence & Sub-Registrar Security</div>
+    </div>
+  </footer>
+
+  <!-- Leaflet GIS Map JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Data Models -->
+  <script src="js/data/delhi-properties.js"></script>
+  <script src="js/data/encumbrances.js"></script>
+  <script src="js/data/deeds.js"></script>
+  <script src="js/data/delhi-geo.js"></script>
+
+  <!-- UI & Feature Components -->
+  <script src="js/components/search.js"></script>
+  <script src="js/components/dossier.js"></script>
+  <script src="js/components/encumbrance-matrix.js"></script>
+  <script src="js/components/risk-engine.js"></script>
+  <script src="js/components/ec-generator.js"></script>
+  <script src="js/components/map-viewer.js"></script>
+  <script src="js/components/bank-portal.js"></script>
+  <script src="js/components/api-sandbox.js"></script>
+
+  <!-- Master App Coordinator -->
+  <script src="js/app.js"></script>
+</body>
+</html>
